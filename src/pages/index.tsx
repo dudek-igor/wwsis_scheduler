@@ -1,11 +1,49 @@
-import Image from "next/image";
 import { Inter } from "next/font/google";
-import { ParticlesBackground } from "@/components/templates";
+import Link from "next/link";
+import { MotionLayout } from "@/components";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import Stack from "@mui/material/Stack";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function Home() {
-  return <main>{/* <ParticlesBackground /> */}</main>;
+export default function HomePage() {
+  return (
+    <MotionLayout>
+      <Stack
+        direction="column"
+        justifyContent="center"
+        alignItems="center"
+        spacing={4}
+      >
+        <Typography align="center" variant="h3" component="h1">
+          Welcome Scheduler
+        </Typography>
+        <Button
+          component={Link}
+          size="large"
+          variant="outlined"
+          href="/sign-in"
+        >
+          Zaloguj się
+        </Button>
+
+        <Typography variant="caption" className="underline text-gray-500">
+          &nbsp;&nbsp;&nbsp;lub&nbsp;&nbsp;&nbsp;
+        </Typography>
+
+        <Button
+          className="max-w-xs"
+          component={Link}
+          size="medium"
+          variant="outlined"
+          href="/sign-up"
+        >
+          Zarejestruj się
+        </Button>
+      </Stack>
+    </MotionLayout>
+  );
 }
 
 {
