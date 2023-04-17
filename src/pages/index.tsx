@@ -4,6 +4,9 @@ import { MotionLayout } from "@/components";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
+import LoginIcon from "@mui/icons-material/Login";
+import Avatar from "@mui/material/Avatar";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -11,18 +14,23 @@ export default function HomePage() {
   return (
     <MotionLayout>
       <Stack
+        className="max-w-md"
         direction="column"
         justifyContent="center"
         alignItems="center"
-        spacing={4}
+        spacing={1}
       >
-        <Typography align="center" variant="h3" component="h1">
+        <Avatar className="bg-[#7ad7f0] flex items-center justify-center">
+          <CalendarMonthIcon />
+        </Avatar>
+        <Typography align="center" variant="h4" component="h1">
           Welcome Scheduler
         </Typography>
         <Button
           component={Link}
           size="large"
           variant="outlined"
+          endIcon={<LoginIcon />}
           href="/sign-in"
         >
           Zaloguj się

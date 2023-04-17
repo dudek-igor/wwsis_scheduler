@@ -1,6 +1,5 @@
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
-import { app } from "@/firebase";
 import { ParticlesBackground } from "@/components";
 import { AnimatePresence } from "framer-motion";
 import { useRouter } from "next/router";
