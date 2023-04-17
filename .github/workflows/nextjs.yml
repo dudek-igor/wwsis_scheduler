@@ -48,6 +48,11 @@ jobs:
             echo "Unable to determine package manager"
             exit 1
           fi
+      - name: Create env file
+        run: |
+          touch .env
+          echo NEXT_PUBLIC_FIREBASE_API_KEY=$NEXT_PUBLIC_FIREBASE_API_KEY >> .env
+          cat .env
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
@@ -75,6 +80,8 @@ jobs:
         run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
       - name: Build with Next.js
         run: ${{ steps.detect-package-manager.outputs.runner }} next build
+        env:
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
       - name: Static HTML export with Next.js
         run: ${{ steps.detect-package-manager.outputs.runner }} next export
       - name: Upload artifact
