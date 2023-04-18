@@ -24,7 +24,7 @@ export default function HomePage() {
           <CalendarMonthIcon />
         </Avatar>
         <Typography align="center" variant="h4" component="h1">
-          Welcome Scheduler
+          Welcome Fitness Scheduler
         </Typography>
         <Button
           component={Link}

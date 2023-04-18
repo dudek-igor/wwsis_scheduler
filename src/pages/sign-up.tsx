@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { MotionLayout } from "@/components";
 import { useState, useCallback } from "react";
-import { auth } from "@/firebase";
+import { auth, db } from "@/firebase";
+import { doc, setDoc } from "firebase/firestore";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import Box from "@mui/material/Box";
 import Avatar from "@mui/material/Avatar";
@@ -50,7 +51,11 @@ export default function SignUp() {
     setLoading(true);
     // Sign In Via firebase
     createUserWithEmailAndPassword(auth, email, password)
-      .then(() => {
+      .then(async (userCredential) => {
+        const { uid } = userCredential.user;
+        await setDoc(doc(db, "users", uid), {
+          admin: false,
+        });
         router.push("/sign-in");
         setLoading(false);
       })
