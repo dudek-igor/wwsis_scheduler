@@ -12,11 +12,13 @@ import Button from "@mui/material/Button";
 import LoginIcon from "@mui/icons-material/Login";
 import CoPresentIcon from "@mui/icons-material/CoPresent";
 import { useRouter } from "next/router";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
 
 export default function SignUp() {
   const router = useRouter();
   const [emailError, setEmailError] = useState<string>(" ");
-  const [passwordError, setPasswordError] = useState<string>(" ");
+  const [passwordError, setPasswordError] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
   const isEmailValid = useCallback((email: string): Boolean => {
@@ -32,10 +34,10 @@ export default function SignUp() {
     return re.test(password);
   }, []);
 
-  const handleChange = () => {
+  const handleChange = useCallback(() => {
     setEmailError(" ");
-    setPasswordError(" ");
-  };
+    setPasswordError(false);
+  }, []);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -44,8 +46,7 @@ export default function SignUp() {
     const password = data.get("password") as string;
     if (!email || !isEmailValid(email))
       return setEmailError("Nieprawidłowy adres email");
-    if (!password || !isPasswordSecure(password))
-      return setPasswordError("Nieprawidłowe hasło");
+    if (!password || !isPasswordSecure(password)) return setPasswordError(true);
     setLoading(true);
     // Sign In Via firebase
     createUserWithEmailAndPassword(auth, email, password)
@@ -89,8 +90,32 @@ export default function SignUp() {
           />
           <TextField
             margin="normal"
-            error={!!passwordError.replaceAll(" ", "")}
-            helperText={passwordError}
+            error={passwordError}
+            helperText={
+              <List
+                disablePadding
+                subheader={
+                  <Typography variant="body1">
+                    Hasło musi zawierać przynajmniej:
+                  </Typography>
+                }
+              >
+                <ListItem disablePadding>
+                  <Typography variant="body2">* Jedną dużą literę</Typography>
+                </ListItem>
+                <ListItem disablePadding>
+                  <Typography variant="body2">* Jedną mała literę:</Typography>
+                </ListItem>
+                <ListItem disablePadding>
+                  <Typography variant="body2">* Jedną cyfrę</Typography>
+                </ListItem>
+                <ListItem disablePadding>
+                  <Typography variant="body2">
+                    * Jeden znak specjalny !@#$%^&*
+                  </Typography>
+                </ListItem>
+              </List>
+            }
             required
             fullWidth
             name="password"
