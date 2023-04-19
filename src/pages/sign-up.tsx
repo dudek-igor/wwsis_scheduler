@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { MotionLayout } from "@/components";
-import { useState, useCallback } from "react";
-import { auth, db } from "@/firebase";
-import { doc, setDoc } from "firebase/firestore";
+import { UserContext } from "@/context";
+import { useState, useCallback, useEffect, useContext } from "react";
+import { auth } from "@/firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import Box from "@mui/material/Box";
 import Avatar from "@mui/material/Avatar";
@@ -21,6 +21,11 @@ export default function SignUp() {
   const [emailError, setEmailError] = useState<string>(" ");
   const [passwordError, setPasswordError] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const userContext = useContext(UserContext);
+
+  useEffect(() => {
+    userContext.isUserAuthenticated() && router.push("/scheduler");
+  }, [router, userContext]);
 
   const isEmailValid = useCallback((email: string): Boolean => {
     const re =
@@ -52,13 +57,7 @@ export default function SignUp() {
     // Sign In Via firebase
     createUserWithEmailAndPassword(auth, email, password)
       .then(async (userCredential) => {
-        const { uid } = userCredential.user;
-        await setDoc(doc(db, "users", uid), {
-          admin: false,
-        });
-        console.log(auth.currentUser);
-
-        // router.push("/sign-in");
+        router.push("/sign-in");
         setLoading(false);
       })
       .catch(() => {

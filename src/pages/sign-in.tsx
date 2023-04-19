@@ -10,10 +10,9 @@ import Button from "@mui/material/Button";
 import LoadingButton from "@mui/lab/LoadingButton";
 import LoginIcon from "@mui/icons-material/Login";
 import { useState, useCallback, useContext, useEffect } from "react";
-import { auth, db } from "@/firebase";
+import { auth } from "@/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "next/router";
-import { doc, getDoc } from "firebase/firestore";
 
 export default function SignIn() {
   const router = useRouter();
@@ -21,6 +20,10 @@ export default function SignIn() {
   const [passwordError, setPasswordError] = useState<string>(" ");
   const [loading, setLoading] = useState<boolean>(false);
   const userContext = useContext(UserContext);
+
+  useEffect(() => {
+    userContext.isUserAuthenticated() && router.push("/scheduler");
+  }, [router, userContext]);
 
   const isEmailValid = useCallback((email: string): Boolean => {
     const re =
@@ -53,7 +56,7 @@ export default function SignIn() {
     // Sign In Via firebase
     signInWithEmailAndPassword(auth, email, password)
       .then(async (userCredential) => {
-        const { uid, email, refreshToken, ...rest } = userCredential.user;
+        const { uid, email, refreshToken } = userCredential.user;
         userContext.addUserData({
           uid,
           refreshToken,
@@ -62,20 +65,13 @@ export default function SignIn() {
         });
         router.push("/scheduler");
         setLoading(false);
-        // ...
       })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log({ errorCode, errorMessage });
-
+      .catch(() => {
+        setEmailError("Niepoprawny login lub hasło");
+        setPasswordError("Niepoprawny login lub hasłoo");
         setLoading(false);
       });
   };
-
-  // useEffect(() => {
-  //   userContext.isUserAuthenticated() && router.push("/dashboard");
-  // }, []);
 
   return (
     <MotionLayout>
@@ -133,20 +129,6 @@ export default function SignIn() {
           </Button>
         </Box>
       </Box>
-      {/* <ul>
-        <li>
-          <Link href="/">Home</Link>
-        </li>
-        <li>
-          <Link href="/sign-up">Sign Up</Link>
-        </li>
-        <li>
-          <Link href="/dashboard">Dashboard</Link>
-        </li>
-        <li>
-          <Link href="/scheduler">Scheduler</Link>
-        </li>
-      </ul> */}
     </MotionLayout>
   );
 }
