@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { MotionLayout } from "@/components";
+import { UserContext } from "@/context";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Avatar from "@mui/material/Avatar";
@@ -8,14 +9,18 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import LoadingButton from "@mui/lab/LoadingButton";
 import LoginIcon from "@mui/icons-material/Login";
-import { useState, useCallback } from "react";
-import { auth } from "@/firebase";
+import { useState, useCallback, useContext, useEffect } from "react";
+import { auth, db } from "@/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import { useRouter } from "next/router";
+import { doc, getDoc } from "firebase/firestore";
 
 export default function SignIn() {
+  const router = useRouter();
   const [emailError, setEmailError] = useState<string>(" ");
   const [passwordError, setPasswordError] = useState<string>(" ");
   const [loading, setLoading] = useState<boolean>(false);
+  const userContext = useContext(UserContext);
 
   const isEmailValid = useCallback((email: string): Boolean => {
     const re =
@@ -47,11 +52,15 @@ export default function SignIn() {
     setLoading(true);
     // Sign In Via firebase
     signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        // Signed in
-        console.log(userCredential);
-
-        const user = userCredential.user;
+      .then(async (userCredential) => {
+        const { uid, email, refreshToken, ...rest } = userCredential.user;
+        userContext.addUserData({
+          uid,
+          refreshToken,
+          email,
+          admin: email?.includes("dudekigor"),
+        });
+        router.push("/scheduler");
         setLoading(false);
         // ...
       })
@@ -63,6 +72,10 @@ export default function SignIn() {
         setLoading(false);
       });
   };
+
+  // useEffect(() => {
+  //   userContext.isUserAuthenticated() && router.push("/dashboard");
+  // }, []);
 
   return (
     <MotionLayout>

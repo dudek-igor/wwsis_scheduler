@@ -56,7 +56,9 @@ export default function SignUp() {
         await setDoc(doc(db, "users", uid), {
           admin: false,
         });
-        router.push("/sign-in");
+        console.log(auth.currentUser);
+
+        // router.push("/sign-in");
         setLoading(false);
       })
       .catch(() => {
