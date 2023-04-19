@@ -1,61 +1,73 @@
-import React from "react";
+import React, { useReducer, Reducer } from "react";
 import { auth } from "@/firebase";
 
 enum UserContextActions {
   ADD_USER_DATA = "ADD_USER_DATA",
   REMOVE_USER_DATA = "REMOVE_USER_DATA",
-  IS_USER_AUTHENTICATED = "IS_USER_AUTHENTICATED",
 }
-
-//Initial State and Actions
-const initialState = {
-  userData: {
-    uid: auth?.currentUser?.uid,
-    refreshToken: auth?.currentUser?.refreshToken,
-    email: auth?.currentUser?.email,
-    admin: auth?.currentUser?.email?.includes("dudekigor"),
-  },
-  addUserData: () => null,
-};
 
 interface ReducerAction {
   type: UserContextActions;
-  payload?: UserNamespace.UserData;
+  payload?: UserNamespace.UserDataState;
 }
 /**
  * @info Reducer to Handle Actions
  */
-const reducer = (state: any, action: ReducerAction) => {
-  console.log({ state });
-
+const reducer: Reducer<UserNamespace.UserDataState, ReducerAction> = (
+  state,
+  action
+) => {
   switch (action.type) {
     case UserContextActions.ADD_USER_DATA:
-      return action.payload;
+      return {
+        uid: action?.payload?.uid,
+        refreshToken: action?.payload?.refreshToken,
+        email: action?.payload?.email,
+        admin: action?.payload?.admin,
+      };
     case UserContextActions.REMOVE_USER_DATA:
-      return {};
-    case UserContextActions.IS_USER_AUTHENTICATED:
-      return !!state?.userData?.uid;
+      return {
+        uid: undefined,
+        refreshToken: undefined,
+        email: undefined,
+        admin: undefined,
+      };
     default:
       return state;
   }
 };
-/**
- * @info Context and Provider
- */
-export const UserContext =
-  React.createContext<UserNamespace.UserContext>(initialState);
+
+export const UserContext = React.createContext<UserNamespace.UserContext>({
+  userData: {},
+  isUserAuthenticated: function (): boolean {
+    throw new Error("Function not implemented.");
+  },
+  addUserData: function (userData: UserNamespace.UserDataState): void {
+    throw new Error("Function not implemented.");
+  },
+  removeUserData: function (): void {
+    throw new Error("Function not implemented.");
+  },
+});
 
 export const UserContextProvider = ({
   children,
 }: {
   children: React.ReactNode;
 }) => {
-  const [state, dispatch] = React.useReducer(reducer, initialState);
+  const [state, dispatch] = useReducer(reducer, {
+    uid: auth?.currentUser?.uid,
+    refreshToken: auth?.currentUser?.refreshToken,
+    email: auth?.currentUser?.email,
+    admin: auth?.currentUser?.email?.includes("dudekigor"),
+  });
+
+  console.log(state);
 
   const value: UserNamespace.UserContext = {
-    ...state,
+    userData: state,
     isUserAuthenticated: () => {
-      return dispatch({ type: UserContextActions.IS_USER_AUTHENTICATED });
+      return !!state?.uid;
     },
 
     addUserData: (userData) => {

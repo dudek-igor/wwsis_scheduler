@@ -1,5 +1,5 @@
 declare namespace UserNamespace {
-  interface UserData {
+  interface UserDataState {
     uid?: string;
     email?: string | null;
     refreshToken?: string;
@@ -7,9 +7,9 @@ declare namespace UserNamespace {
   }
 
   interface UserContext {
-    userData: UserData;
-    isUserAuthenticated?: () => boolean;
+    userData: UserDataState;
+    isUserAuthenticated: () => boolean;
     addUserData: (userData: UserData) => void;
-    removeUserData?: () => void;
+    removeUserData: () => void;
   }
 }
