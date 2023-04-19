@@ -61,7 +61,7 @@ export default function SchedulerPage() {
         }
       );
       return setFitnessList(parsedfitnessSubscribersWorkouts);
-    } else if (fitnessByDay.exists()) {
+    } else if (fitnessByDay.exists() && fitnessByDay.data()?.workouts) {
       return setFitnessList(fitnessByDay.data().workouts);
     } else {
       return setFitnessList([]);
@@ -86,7 +86,7 @@ export default function SchedulerPage() {
         <Divider />
         <Box className="py-4">
           <Typography component="p" variant="body1" gutterBottom>
-            Poziom zaawsnowania zajęć fitness
+            Poziom zaawansowania zajęć fitness
           </Typography>
 
           <Stack
