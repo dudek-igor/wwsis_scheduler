@@ -1,26 +1,16 @@
 import { MotionLayout, FitnessList } from "@/components";
-import { days } from "@/config";
+import { days, difficultyColors } from "@/config";
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
 import Typography from "@mui/material/Typography";
 import LinearProgress from "@mui/material/LinearProgress";
-import { Stack } from "@mui/material";
+import Stack from "@mui/material/Stack";
+import Paper from "@mui/material/Paper";
 import { useEffect, useState, useCallback, useContext } from "react";
-import {
-  DocumentData,
-  DocumentSnapshot,
-  arrayUnion,
-  updateDoc,
-  doc,
-  getDoc,
-  getDocs,
-  collection,
-  setDoc,
-} from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/firebase";
 import { UserContext } from "@/context";
 import { useRouter } from "next/router";
-import Link from "next/link";
 
 export default function SchedulerPage() {
   /**
@@ -50,8 +40,10 @@ export default function SchedulerPage() {
     );
 
     if (fitnessByDay.exists() && fitnessSubscribers.exists()) {
-      const fitnessSubscribersData = fitnessSubscribers.data().subscribers;
-      const fitnessByDayData = fitnessByDay.data().workouts;
+      const fitnessSubscribersData = fitnessSubscribers.data()
+        .subscribers as FitnessData.FitnessSubscriber[];
+      const fitnessByDayData = fitnessByDay.data()
+        .workouts as FitnessData.FitnessListItem[];
 
       const parsedfitnessSubscribersWorkouts = fitnessByDayData.map(
         ({ uuid, ...rest }) => {
@@ -60,8 +52,7 @@ export default function SchedulerPage() {
             ...rest,
             checked: fitnessSubscribersData.some(
               ({ fitness_uuid, user_uid }) =>
-                fitness_uuid === uuid &&
-                user_uid === "1yrczRRWireqpeJdAiKjjWsopD23"
+                fitness_uuid === uuid && user_uid === userContext.userData.uid
             ),
             subscribers: fitnessSubscribersData.filter(
               ({ fitness_uuid }) => fitness_uuid === uuid
@@ -69,44 +60,13 @@ export default function SchedulerPage() {
           };
         }
       );
-      console.log(parsedfitnessSubscribersWorkouts);
-
       return setFitnessList(parsedfitnessSubscribersWorkouts);
     } else if (fitnessByDay.exists()) {
       return setFitnessList(fitnessByDay.data().workouts);
     } else {
       return setFitnessList([]);
     }
-
-    // if (fitnessSubscribersData.exists()) {
-    //   console.log(fitnessSubscribersData.data().subscribers);
-    //   setFitnessSubscribersList(fitnessSubscribersData.data().subscribers);
-    // } else {
-    //   setFitnessSubscribersList([]);
-    // }
-
-    // const data = await getDocs(collection(db, "fitness"));
-    // data.forEach((doc) => {
-    //   // doc.data() is never undefined for query doc snapshots
-    //   console.log(doc.id, " => ", doc.data());
-    // });
-    // const day = new Date().getDay();
-
-    // doc(db, "fitness_by_day", day);
-
-    // const data = await getDoc(
-    //   doc(db, "fitness_by_day", new Date().getDay().toString())
-    // );
-    // const { workouts } = data.data();
-    // console.log(workouts);
-
-    // workouts.forEach((doc) => {
-    //   // doc.data() is never undefined for query doc snapshots
-    //   console.log(doc.get());
-
-    //   // console.log(doc.id, " => ", doc.data());
-    // });
-  }, []);
+  }, [userContext.userData.uid]);
 
   useEffect(() => {
     fetchFitnessData();
@@ -123,6 +83,39 @@ export default function SchedulerPage() {
         <Typography component="p" variant="h5" gutterBottom>
           {new Date().toLocaleDateString()}
         </Typography>
+        <Divider />
+        <Box className="py-4">
+          <Typography component="p" variant="body1" gutterBottom>
+            Poziom zaawsnowania zajęć fitness
+          </Typography>
+
+          <Stack
+            className="py-2"
+            direction="row"
+            flexWrap="wrap"
+            divider={<Divider orientation="vertical" flexItem />}
+            spacing={2}
+          >
+            <Paper
+              sx={{ bgcolor: difficultyColors[1] }}
+              className="flex-auto text-white"
+            >
+              Łatwe
+            </Paper>
+            <Paper
+              sx={{ bgcolor: difficultyColors[2] }}
+              className="flex-auto text-white"
+            >
+              Średnie
+            </Paper>
+            <Paper
+              sx={{ bgcolor: difficultyColors[3] }}
+              className="flex-auto text-white"
+            >
+              Trudne
+            </Paper>
+          </Stack>
+        </Box>
         <Divider />
         {!fitnessList ? (
           <Stack className="p-16 w-96" direction="column" spacing={2}>
@@ -148,11 +141,6 @@ export default function SchedulerPage() {
           </>
         )}
       </Box>
-      <Link href="/">Home</Link>
-      <br />
-      <Link href="/sign-in">sign-in</Link>
-      <br />
-      <Link href="/sing-up">sing-up</Link>
     </MotionLayout>
   );
 }
