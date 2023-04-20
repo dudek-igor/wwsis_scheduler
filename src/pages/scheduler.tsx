@@ -16,7 +16,9 @@ export default function SchedulerPage() {
   /**
    * @info Hooks
    */
-  const [fitnessList, setFitnessList] = useState<any>();
+  const [fitnessList, setFitnessList] = useState<FitnessData.FitnessListItem[]>(
+    []
+  );
   const userContext = useContext(UserContext);
   const router = useRouter();
   /**
@@ -26,7 +28,8 @@ export default function SchedulerPage() {
     if (!userContext.isUserAuthenticated()) {
       router.push("/sign-in");
     }
-  }, [router, userContext]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   /**
    * @info Fetch fitness data
    */
@@ -61,10 +64,10 @@ export default function SchedulerPage() {
         }
       );
       return setFitnessList(parsedfitnessSubscribersWorkouts);
-    } else if (fitnessByDay.exists() && fitnessByDay.data()?.workouts) {
+    }
+
+    if (fitnessByDay.exists() && fitnessByDay.data()?.workouts) {
       return setFitnessList(fitnessByDay.data().workouts);
-    } else {
-      return setFitnessList([]);
     }
   }, [userContext.userData.uid]);
 

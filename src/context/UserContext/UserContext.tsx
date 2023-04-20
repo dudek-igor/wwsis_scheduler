@@ -42,7 +42,7 @@ export const UserContext = React.createContext<UserNamespace.UserContext>({
   isUserAuthenticated: function (): boolean {
     throw new Error("Function not implemented.");
   },
-  addUserData: function (userData: UserNamespace.UserDataState): void {
+  addUserData: function (): void {
     throw new Error("Function not implemented.");
   },
   removeUserData: function (): void {
@@ -61,8 +61,6 @@ export const UserContextProvider = ({
     email: auth?.currentUser?.email,
     admin: auth?.currentUser?.email?.includes("dudekigor"),
   });
-
-  console.log(state);
 
   const value: UserNamespace.UserContext = {
     userData: state,
