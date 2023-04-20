@@ -23,7 +23,8 @@ export default function SignIn() {
 
   useEffect(() => {
     userContext.isUserAuthenticated() && router.push("/scheduler");
-  }, [router, userContext]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const isEmailValid = useCallback((email: string): boolean => {
     const re =
