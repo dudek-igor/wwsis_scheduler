@@ -11,6 +11,10 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/firebase";
 import { UserContext } from "@/context";
 import { useRouter } from "next/router";
+import ButtonGroup from "@mui/material/ButtonGroup";
+import Button from "@mui/material/Button";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 
 export default function SchedulerPage() {
   /**
@@ -19,6 +23,7 @@ export default function SchedulerPage() {
   const [fitnessList, setFitnessList] = useState<
     FitnessData.FitnessListItem[] | undefined
   >();
+  const [date, setDate] = useState(new Date());
   const userContext = useContext(UserContext);
   const router = useRouter();
   /**
@@ -34,12 +39,13 @@ export default function SchedulerPage() {
    * @info Fetch fitness data
    */
   const fetchFitnessData = useCallback(async () => {
+    setFitnessList(undefined);
     const fitnessSubscribers = await getDoc(
-      doc(db, "fitness_subscribers", new Date().toLocaleDateString())
+      doc(db, "fitness_subscribers", date.toLocaleDateString())
     );
 
     const fitnessByDay = await getDoc(
-      doc(db, "fitness_by_day", new Date().getDay().toString())
+      doc(db, "fitness_by_day", date.getDay().toString())
     );
 
     if (fitnessByDay.exists() && fitnessSubscribers.exists()) {
@@ -69,7 +75,9 @@ export default function SchedulerPage() {
     if (fitnessByDay.exists() && fitnessByDay.data()?.workouts) {
       return setFitnessList(fitnessByDay.data().workouts);
     }
-  }, [userContext.userData.uid]);
+
+    return setFitnessList([]);
+  }, [date, userContext.userData.uid]);
 
   useEffect(() => {
     fetchFitnessData();
@@ -81,11 +89,36 @@ export default function SchedulerPage() {
     <MotionLayout>
       <Box className="text-center">
         <Typography component="h1" variant="h4">
-          {days[new Date().getDay()]}
+          {days[date.getDay()]}
         </Typography>
-        <Typography component="p" variant="h5" gutterBottom>
-          {new Date().toLocaleDateString()}
-        </Typography>
+        <ButtonGroup variant="text" size="large" className="mb-2">
+          <Button
+            disabled={
+              date.toLocaleDateString() === new Date().toLocaleDateString()
+            }
+            onClick={() =>
+              setDate(
+                (prevState) =>
+                  new Date(prevState.setDate(prevState.getDate() - 1))
+              )
+            }
+          >
+            <ArrowBackIosNewIcon />
+          </Button>
+          <Button disabled className="disabled:text-black">
+            {date.toLocaleDateString()}
+          </Button>
+          <Button
+            onClick={() =>
+              setDate(
+                (prevState) =>
+                  new Date(prevState.setDate(prevState.getDate() + 1))
+              )
+            }
+          >
+            <ArrowForwardIosIcon />
+          </Button>
+        </ButtonGroup>
         <Divider />
         <Box className="py-4">
           <Typography component="p" variant="body1" gutterBottom>
@@ -139,7 +172,7 @@ export default function SchedulerPage() {
                 Brak Zajęć
               </Typography>
             ) : (
-              <FitnessList fitnessList={fitnessList} />
+              <FitnessList day={date} fitnessList={fitnessList} />
             )}
           </>
         )}

@@ -78,7 +78,7 @@ export const UserContextProvider = ({
   const value: UserNamespace.UserContext = {
     userData: state,
     isUserAuthenticated: () => {
-      return !!state?.uid;
+      return !!state?.uid || !!window?.localStorage.getItem("AccesToken");
     },
 
     addUserData: (userData) => {

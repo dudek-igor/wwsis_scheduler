@@ -11,6 +11,7 @@ declare namespace FitnessData {
   }
 
   interface FitnessList {
+    day: Date;
     fitnessList: FitnessListItem[];
   }
 
