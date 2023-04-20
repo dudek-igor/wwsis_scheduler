@@ -1,4 +1,6 @@
-import React, { useReducer, Reducer } from "react";
+import React, { useReducer, Reducer, useEffect } from "react";
+import jwt from "jsonwebtoken";
+
 import { auth } from "@/firebase";
 
 enum UserContextActions {
@@ -21,14 +23,12 @@ const reducer: Reducer<UserNamespace.UserDataState, ReducerAction> = (
     case UserContextActions.ADD_USER_DATA:
       return {
         uid: action?.payload?.uid,
-        refreshToken: action?.payload?.refreshToken,
         email: action?.payload?.email,
         admin: action?.payload?.admin,
       };
     case UserContextActions.REMOVE_USER_DATA:
       return {
         uid: undefined,
-        refreshToken: undefined,
         email: undefined,
         admin: undefined,
       };
@@ -57,10 +57,23 @@ export const UserContextProvider = ({
 }) => {
   const [state, dispatch] = useReducer(reducer, {
     uid: auth?.currentUser?.uid,
-    refreshToken: auth?.currentUser?.refreshToken,
     email: auth?.currentUser?.email,
     admin: auth?.currentUser?.email?.includes("dudekigor"),
   });
+
+  useEffect(() => {
+    const accesToken = window?.localStorage.getItem("AccesToken");
+    if (accesToken) {
+      const { email, user_id } = jwt.decode(accesToken) as {
+        email: string;
+        user_id: string;
+      };
+      dispatch({
+        type: UserContextActions.ADD_USER_DATA,
+        payload: { email, uid: user_id, admin: email?.includes("dudekigor") },
+      });
+    }
+  }, []);
 
   const value: UserNamespace.UserContext = {
     userData: state,

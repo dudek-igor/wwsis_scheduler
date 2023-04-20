@@ -16,9 +16,9 @@ export default function SchedulerPage() {
   /**
    * @info Hooks
    */
-  const [fitnessList, setFitnessList] = useState<FitnessData.FitnessListItem[]>(
-    []
-  );
+  const [fitnessList, setFitnessList] = useState<
+    FitnessData.FitnessListItem[] | undefined
+  >();
   const userContext = useContext(UserContext);
   const router = useRouter();
   /**

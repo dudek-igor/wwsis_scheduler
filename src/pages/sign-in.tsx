@@ -56,10 +56,11 @@ export default function SignIn() {
     // Sign In Via firebase
     signInWithEmailAndPassword(auth, email, password)
       .then(async (userCredential) => {
-        const { uid, email, refreshToken } = userCredential.user;
+        const { uid, email } = userCredential.user;
+        const accessToken = await userCredential.user.getIdToken();
+        accessToken && window?.localStorage.setItem("AccesToken", accessToken);
         userContext.addUserData({
           uid,
-          refreshToken,
           email,
           admin: email?.includes("dudekigor"),
         });
